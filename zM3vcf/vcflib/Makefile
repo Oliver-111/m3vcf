@@ -3,7 +3,7 @@ CC = gcc
 INC_DIR = inc
 SRC_DIR = src
 OBJ_DIR	= obj
-TEST_DIR = tst
+#TEST_DIR = tst
 TARGET_DIR = bin
 
 

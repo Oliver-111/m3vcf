@@ -1,11 +1,11 @@
 getVcfMH.c：	Gets the number of marker and the number of sample，and confirms the equal number of samples in every marker. Tool's name is gVMH after make work, Please refer to the instruction document for details.
-		打印vcf中的marker数和haplotype数，并测试vcf文件中每一行记录是否符合haplotype数,make后生成工具gVMH，具体用法见说明文档。
+		打印vcf中的marker数和sample数，并测试vcf文件中每一行记录是否符合sample数,make后生成工具gVMH，具体用法见说明文档。
 
 copyCreateVcf.c：	Create a new vcf file based on a real vcf file, expands N times of every marker from real vcf file, fill it in the new vcf file. Tool's name is pVcf after make work, Please refer to the instruction document for details.
-		用真实文件填充创建一个vcf测试文件。用真实vcf的一行扩充n倍（顺序打乱）合成目标vcf的一行。需要vcf真实文件,make后生成工具pVcf，具体用法见说明文档
+		用真实文件填充创建一个vcf测试文件。用真实vcf的每一行扩充n倍（顺序打乱）合成目标vcf的一行。需要vcf真实文件,make后生成工具pVcf，具体用法见说明文档
 
-vcfCutMarker.c：	Create a new vcf file，it is the first n makers from large vcf flie.  Tool's name is vCM after make work, Please refer to the instruction document for details.
-		从大文件中截取指定行内容到新的小文件中。make后生成工具vCM，具体用法见说明文档
+vcfCutMarker.c：	Create a new vcf file，it is the first n makers and first m samples from large vcf flie.  Tool's name is vCM after make work, Please refer to the instruction document for details.
+		从大文件中截取指定行、指定列内容到新的小文件中。make后生成工具vCM，具体用法见说明文档
 
 readVcfTest.c：	The test tool of vcflib, tests the speed of vcflib reads vcfflie. Tool's name is readVcfTest after make work, Please refer to the instruction document for details.
 		用于测试vcflib的读取vcf文件的速度。只读，不做任何操作。make后生成工具readVcfTest，具体用法见说明文档

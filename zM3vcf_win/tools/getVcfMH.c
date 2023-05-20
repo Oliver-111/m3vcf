@@ -21,6 +21,11 @@ int getItem(char *pLineBuf)
 
 int main(int argc,char** argv )
 {
+	if(argc != 2)
+	{
+		printf("Usage: %s VCFFile\n",argv[0]);
+		return 1;
+	}
 	VCF_FILE fp1;
 	char *lineBuf=(char*)malloc(sizeof(char)*MAX_LINE_BUF);
 	int numSamples=0;

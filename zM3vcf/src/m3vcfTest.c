@@ -1,9 +1,9 @@
 #include "m3vcf/m3vcf.h"
 
-int default_block_size = 1000;
-const char *vcf_file_path = "testFile/ALL.chr22.10000Markers.vcf.gz";
-const char *m3vcf_flie_path = "testFile/ALL.chr22.10000Markers.m3vcf.gz";
-const char *if_vcf_file_path = "testFile/ALL.chr22.10000Markers.IF.vcf.gz";
+int default_block_size = 10;
+const char *vcf_file_path = "testFile/ALL.chr22.20Markers.10Samples.vcf.gz";
+const char *m3vcf_flie_path = "testFile/ALL.chr22.20Markers.10Samples.m3vcf.gz";
+const char *if_vcf_file_path = "testFile/ALL.chr22.20Markers.10Samples.IF.vcf.gz";
 
 int main(int argc,char** argv)
 {

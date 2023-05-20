@@ -1,5 +1,5 @@
 #include "vcflib.h"
-const char *file_path="ALL.chr22.10000Markers.vcf.gz";
+const char *file_path="ALL.chr22.20Markers.10Samples.vcf.gz";
 
 int main(int argc,char** argv )
 {
