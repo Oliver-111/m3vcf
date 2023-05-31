@@ -1,10 +1,10 @@
 # vcflib demo
 zM3vcf/vcflib/tst文档中的测试程序simpleRead.c  
 首先完成vcflib编译：  
-···Bash
+```Bash
 cd zM3vcf/vcflib·  
 make
-···
+```
 然后进入zM3vcf/vcflib/tst中完成测试代码的编译（当前工作目录为zM3vcf/vcflib）  
 cd tst  
 make simpleRead   
