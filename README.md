@@ -15,7 +15,7 @@ cd zM3vcf
 make vcflib  
 然后执行：  
 make zM3vcf  
-即可完成Command line工具的生成,工具在zM3vcf文件夹下，工具名为zM3vcf    
+即可完成Command line工具的生成，工具在zM3vcf文件夹下，工具名为zM3vcf    
 
 demo 用法  
 zM3vcf/src文档中的测试程序m3vcfTest.c   
