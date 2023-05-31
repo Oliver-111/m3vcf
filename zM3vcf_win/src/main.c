@@ -123,7 +123,7 @@ void convertParsingArg(int argc, char *argv[],M3VCF_CONVERT_ARGS *args)
 	int c;
     args->vcfFileName = "-";
     args->vcfFileType = FILE_MODE_GZ;
-	args->m3vcfFileType = FILE_MODE_GZ;
+	args->m3vcfFileType = FILE_MODE_NORMAL;
     
     static struct option loptions[] =
     {
