@@ -1,40 +1,28 @@
-# vcflib demo
-zM3vcf/vcflib/tst文档中的测试程序simpleRead.c  
-首先完成vcflib编译：  
+# vcflib 
+The main functionality of the vcflib library is to efficiently read VCF files into memory. It supports both uncompressed VCF files and gzipped files compressed with zlib.
+**Compiling**
+Go to the directory of vcflib and compile vcflib
 ```Bash
 cd zM3vcf/vcflib  
 make
 ```
-然后进入zM3vcf/vcflib/tst中完成测试代码的编译（当前工作目录为zM3vcf/vcflib）  
+**Demo**
+The vcflib demo codes is the zM3vcf/vcflib/tst/simpleRead.c file. Go to the directory and compile demo (current work path is zM3vcf/vcflib）  
 ```Bash
 cd tst  
 make simpleRead   
 ```
-即可完成测试程序的生成，该程序在zM3vcf/vcflib/tst文件夹下，程序名为simpleRead    
-# m3vcf
-**Command line 用法**  
-编译Command line工具的方法：  
-首先进入zM3vcf目录，并完成vcflib编译：  
+the demo demonstrates the simplest read operation.
+# zM3vcf
+The main functionality of the zM3vcf library is to efficiently compress vcf to m3vcf, and convert m3vcf to vcf. It supports both uncompressed VCF files and gzipped files compressed with zlib.
+**Compiling**  
+Go to the directory of zM3vcf, make sure compile vcflib first, then compile and generate the zM3vcf tool and the m3vcf interface testing program(m3vcfTest)
+
 ```Bash
 cd zM3vcf  
 make vcflib  
+make  
 ```
-然后执行：  
-```Bash
-make zM3vcf  
-```
-即可完成Command line工具的生成，工具在zM3vcf文件夹下，工具名为zM3vcf    
-
-**demo 用法**  
-zM3vcf/src文档中的测试程序m3vcfTest.c   
-首先进入zM3vcf目录，并完成vcflib编译：  
-```Bash
-cd zM3vcf  
-make vcflib  
-```
-然后执行：  
-```Bash
-make m3vcfTest  
-```
-即可完成接口测试程序的生成，该程序在zM3vcf文件夹下，程序名为m3vcfTest  
-
+zM3vcf:		command line tools.
+m3vcfTest: 	m3vcf interface testing program.
+For detail, please refer to FM3VCF_instruction.pdf.
