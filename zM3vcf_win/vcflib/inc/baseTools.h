@@ -39,6 +39,11 @@ int countNumSubString(char *lineStr);
 int getStrPosition(char *lineStr,char *str);
 // get the str string in lineStr at pos position with ":" delimiter
 BT_STATUS getPositionStr(char *lineStr,int pos,char *str );
+// get the number of the string in lineStr with ":" delimiter
+int getSTRNum(char *lineStr);
+// pop first string address of the string in lineStr with ":" delimiter
+BT_STATUS popStrAddress(char **lineStr,char **firstAddr);
+
 // check user input answer: Y/N
 BT_AMSWER_FLAG questionUserYN(char* question);
 // malloc and free float* type space

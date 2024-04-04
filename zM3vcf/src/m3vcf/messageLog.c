@@ -95,12 +95,16 @@ void zLogMessage(const char *format, ...)
 
 void zSLMessage(const char *format, ...)
 {
+	//to log flie
 	va_list argptr;
 	va_start(argptr, format);
-	vprintf(format, argptr);
 	fprintf(g_mlLogFp,"[%s]\t",mlDateAndTimeString());
 	vfprintf(g_mlLogFp,format,argptr);
 	fflush(g_mlLogFp);
+	va_end(argptr);
+	//to screen
+	va_start(argptr, format);
+	vprintf(format, argptr);
 	va_end(argptr);
 }
 

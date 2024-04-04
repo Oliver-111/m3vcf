@@ -220,6 +220,46 @@ BT_STATUS getPositionStr(char *lineStr,int pos,char *str )
 	return BT_ERROR;
 }
 
+int getSTRNum(char *lineStr)
+{
+	int i=0;
+	int num=0;
+	for(i=0;'\0'!=lineStr[i];i++)
+	{	
+		if(':'==lineStr[i])
+		{
+			num++;
+		}
+	}
+	num++;
+	return num;
+}
+
+BT_STATUS popStrAddress(char **lineStr,char **firstAddr)
+{
+	int i;
+	
+	if(!lineStr || '\0'==(*lineStr)[0])
+	{
+		return BT_ERROR;
+	}
+
+	(*firstAddr)=(*lineStr);
+	
+	for(i=0;'\0'!=(*lineStr)[i];i++)
+	{
+		if(':'==(*lineStr)[i] )
+		{
+			(*lineStr)[i]='\0';
+			break;
+			
+		}
+	}
+	(*lineStr)+=i+1;
+	return BT_OK;
+
+}
+
 BT_AMSWER_FLAG questionUserYN(char* question)
 {
 	char answer[BT_MIN_STR_SIZE];
@@ -401,12 +441,16 @@ void btLogMessage(const char *format, ...)
 
 void btStdMessage(const char *format, ...)
 {
+	//to log flie
 	 va_list argptr;
 	 va_start(argptr, format);
-	 vprintf(format, argptr);
 	 fprintf(g_btLogFp,"[%s]\t",btDateAndTimeString());
 	 vfprintf(g_btLogFp,format,argptr);
 	 fflush(g_btLogFp);
+	 va_end(argptr);
+	//to screen
+	 va_start(argptr, format);
+	 vprintf(format, argptr);
 	 va_end(argptr);
 }
 

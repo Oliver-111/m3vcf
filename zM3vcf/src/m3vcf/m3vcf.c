@@ -918,7 +918,7 @@ M3VCF_STATUS m3vcfConvertToVcf(M3VCF_CONVERT_ARGS *mcap)
 
 	//init log
 	zLogInit();
-	zSLMessage("convert m3vcf file[%s] filetype[%s] to vcf file[%s] filetype[%s]. beginning...\n", 
+	zSLMessage("convert m3vcf file[%s] filetype[%s] to vcf file[%s] filetype[%s]. \nbeginning...\n", 
 		mcap->vcfFileName,
 		(FILE_MODE_NORMAL==mcap->m3vcfFileType)?"m3vcf":"gz",
 		mcap->m3vcfFileName,

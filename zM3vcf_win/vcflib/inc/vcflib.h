@@ -76,6 +76,30 @@ typedef struct
 	int numDataLines;
 }DATA_BLOCK;
 
+typedef struct
+{
+	char *format;
+	char **dataStr;
+}DATA_FORMAT_STR;
+
+//all format data line structrue
+typedef struct
+{
+	char *rawDataLine;
+	DATA_INFO dataInfo;
+	int numFormats;
+	DATA_FORMAT_STR *dataFormatStr;
+	int numSamples;
+}DATA_LINE_ALL_FORMAT;
+
+//all format data block structrue
+typedef struct
+{
+	DATA_LINE_ALL_FORMAT *dataLines;
+	int numDataLines;
+}DATA_BLOCK_ALL_FORMAT;
+
+
 //file_handle
 typedef struct
 {
@@ -121,7 +145,6 @@ VCF_STATUS vcfFileReadDataBlock(VCF_FILE *fp,DATA_BLOCK *dbp,int numLines);
 //read numLines data lines with overlap 1 line mode(for m3vcf require), to DATA_BLOCK structure(multilthreads)
 VCF_STATUS vcfFileReadDataBlockOverlap1Line(VCF_FILE *fp,DATA_BLOCK *dbp,int numLines);
 
-
 //////////////////////////////////write file interface/////////////////////////////////////////
 //write a string line to a vcf file
 VCF_STATUS vcfFileWriteLine(VCF_FILE *fp,char *lineStr);
@@ -139,5 +162,19 @@ void clearDataLine(DATA_LINE *dlp);
 void clearDataBlock(DATA_BLOCK *dbp);
 VCF_STATUS vcfPopSubString(char **lineStr,char *subStr);
 void printDataLine(DATA_LINE *dlp);
+
+//////////////////////////parse all format Data interface////////////////////////////////
+//parse a data line string to all format DATA_LINE structure
+VCF_STATUS vcfFileParseDataLine_allFormat(VCF_FILE *fp,char *lineStr,DATA_LINE_ALL_FORMAT *dlafp);
+//read a data line to DATA_LINE structure
+VCF_STATUS vcfFileReadDataLine_allFormat(VCF_FILE *fp,DATA_LINE_ALL_FORMAT *dlafp);
+//read numLines data lines to DATA_BLOCK structure(multilthreads)
+VCF_STATUS vcfFileReadDataBlock_allFormat(VCF_FILE *fp,DATA_BLOCK_ALL_FORMAT *dbafp,int numLines);
+
+void clearDataLine_allFormat(DATA_LINE_ALL_FORMAT *dlafp);
+void clearDataBlock_allFormat(DATA_BLOCK_ALL_FORMAT *dbafp);
+void printDataLine_allFormat(DATA_LINE_ALL_FORMAT *dlafp);
+
+
 
 #endif 

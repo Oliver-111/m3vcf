@@ -117,7 +117,7 @@ static VCF_STATUS vcfCommonOpen(VCF_FILE *fp,const char *fileName,FILE_MODE file
 		fp->fp.fp=fopen(fileName,openMode);
 		if(NULL == fp->fp.fp)
 		{
-			btStdMessage("open %s file error!\n",fileName);
+			btStdMessage("can't open %s file!\n",fileName);
 			return VCF_ERROR;
 		}
 	}
@@ -127,7 +127,7 @@ static VCF_STATUS vcfCommonOpen(VCF_FILE *fp,const char *fileName,FILE_MODE file
 		fp->fp.gfp=gzopen(fileName,openMode);
 		if(NULL == fp->fp.gfp)
 		{
-			btStdMessage("open %s file error!\n",fileName);
+			btStdMessage("can't open %s file!\n",fileName);
 			return VCF_ERROR;
 		}
 	}
@@ -142,10 +142,9 @@ static VCF_STATUS vcfCommonOpen(VCF_FILE *fp,const char *fileName,FILE_MODE file
 	
 VCF_STATUS vcfFileOpen(VCF_FILE *fp,const char *fileName,FILE_MODE fileMode,unsigned int parseItem)
 {
-	
 	if(VCF_ERROR==vcfCommonOpen(fp,fileName,fileMode,"rb"))
 	{
-		btStdMessage("function:%s error!\n",__func__);
+		btStdMessage("function:%s return failure!\n",__func__);
 		return VCF_ERROR;
 	}
 	
@@ -447,7 +446,7 @@ VCF_STATUS vcfFileParseDataLine(VCF_FILE *fp,char *lineStr,DATA_LINE *dlp)
 			}
 			else
 			{
-				btStdMessage("###%s### DS item wrong!\n",dlp->rawDataLine);
+				btStdMessage("###rs:%s\tchr:%s\tpos:%s### DS item wrong!\n",dlp->dataInfo.ID,dlp->dataInfo.chrom,dlp->dataInfo.pos);
 			}
 		}
 
@@ -456,7 +455,7 @@ VCF_STATUS vcfFileParseDataLine(VCF_FILE *fp,char *lineStr,DATA_LINE *dlp)
 	
 	if(dlp->numSamples!=fp->numSamples)
 	{
-		btStdMessage("###%s### marker samples number wrong!\n",dlp->rawDataLine);
+		btStdMessage("###rs:%s\tchr:%s\tpos:%s### marker samples number wrong!\n",dlp->dataInfo.ID,dlp->dataInfo.chrom,dlp->dataInfo.pos);
 		btStdMessage("file sample number:%d marker sample number:%d\n",fp->numSamples,dlp->numSamples);
 	}
 	return VCF_OK;
@@ -471,7 +470,7 @@ VCF_STATUS vcfFileReadDataLine(VCF_FILE *fp,DATA_LINE *dlp)
 	}
 	char *tmpLineStr;
 	btMallocFreeCharP(&tmpLineStr,BT_MAX_LINE_SIZE,BT_MALLOC);
-	memset(tmpLineStr,0,BT_MAX_LINE_SIZE);
+	//memset(tmpLineStr,0,BT_MAX_LINE_SIZE);
 
 	//clear dataline
 	clearDataLine(dlp);
@@ -749,5 +748,237 @@ VCF_STATUS vcfFileRemoveMetaInfoLine(FILE_HEAD *fhp,int posIndex)
 	return VCF_OK;
 }
 
+
+
+//all format interface
+//parse a data line string to all format DATA_LINE structure
+VCF_STATUS vcfFileParseDataLine_allFormat(VCF_FILE *fp,char *lineStr,DATA_LINE_ALL_FORMAT *dlafp)
+{
+	if(NULL==lineStr || NULL==dlafp)
+	{
+		btStdMessage("function:%s parameters error!\n",__func__);
+		return VCF_ERROR;
+	}
+	char itemStr[BT_MIN_STR_SIZE];
+	char *tmpStr;
+	int i,j;
+	
+	dlafp->rawDataLine=strdup(lineStr);
+	
+	//fill datainfo
+	lineStr=vcfFileParseDataLineInfo(dlafp->rawDataLine,&(dlafp->dataInfo));
+	
+	//fill data part
+	dlafp->numFormats=getSTRNum(dlafp->dataInfo.format);
+	dlafp->numSamples=countNumSubString(lineStr);
+	if(dlafp->numSamples!=fp->numSamples)
+	{
+		btStdMessage("###rs:%s\tchr:%s\tpos:%s### marker samples number wrong!\n",dlafp->dataInfo.ID,dlafp->dataInfo.chrom,dlafp->dataInfo.pos);
+		btStdMessage("file sample number:%d marker sample number:%d\n",fp->numSamples,dlafp->numSamples);
+		exit(1);
+	}
+	dlafp->dataFormatStr=(DATA_FORMAT_STR*)malloc(dlafp->numFormats*sizeof(DATA_FORMAT_STR));
+	if(NULL == (dlafp->dataFormatStr))
+	{
+		btStdMessage("DATA_FORMAT_STR* malloc error!\n");
+		exit(1);
+	}
+	
+	for(i=0;i<dlafp->numFormats;i++)
+	{
+		getPositionStr(dlafp->dataInfo.format,i+1,itemStr);
+		dlafp->dataFormatStr[i].format=strdup(itemStr);
+		dlafp->dataFormatStr[i].dataStr=(char**)malloc(dlafp->numSamples*sizeof(char*));
+		if(NULL==dlafp->dataFormatStr[i].dataStr)
+		{
+			btStdMessage("dataStr malloc error!\n");
+			exit(1);
+		}		
+	}
+
+	for(i=0;i<dlafp->numSamples;i++)
+	{
+		if(BT_ERROR==popSubAddress(&lineStr,&tmpStr))
+		{
+			btStdMessage("pop sub string error!\n");
+			exit(1);
+		}
+		
+		for(j=0;j<dlafp->numFormats;j++)
+		{
+			popStrAddress(&tmpStr,&(dlafp->dataFormatStr[j].dataStr[i]));
+		}
+	}
+
+	return VCF_OK;
+}
+
+//read a data line to DATA_LINE structure
+VCF_STATUS vcfFileReadDataLine_allFormat(VCF_FILE *fp,DATA_LINE_ALL_FORMAT *dlafp)
+{
+	if(NULL==fp || NULL==dlafp)
+	{
+		btStdMessage("function:%s parameters error!\n",__func__);
+		return VCF_ERROR;
+	}
+	char *tmpLineStr;
+	btMallocFreeCharP(&tmpLineStr,BT_MAX_LINE_SIZE,BT_MALLOC);
+	//memset(tmpLineStr,0,BT_MAX_LINE_SIZE);
+
+	//clear dataline
+	clearDataLine_allFormat(dlafp);
+	
+	if(VCF_EOF==vcfFileReadLine(fp,tmpLineStr,BT_MAX_LINE_SIZE))
+	{
+		btMallocFreeCharP(&tmpLineStr,0,BT_FREE);	
+		return VCF_EOF;
+	}
+	vcfFileParseDataLine_allFormat(fp,tmpLineStr,dlafp);
+	btMallocFreeCharP(&tmpLineStr,0,BT_FREE);
+
+	//check number of head line items and number of samples for equality
+	if(dlafp->numSamples!=fp->numSamples)
+	{
+		btStdMessage("function:%s Vcf data line samples number error,system quit\n",__func__);
+		exit(1);
+	}
+	return VCF_OK;
+}
+
+//read numLines data lines to DATA_BLOCK structure(multilthreads)
+VCF_STATUS vcfFileReadDataBlock_allFormat(VCF_FILE *fp,DATA_BLOCK_ALL_FORMAT *dbafp,int numLines)
+{
+	if(NULL==fp || NULL==dbafp)
+	{
+		btStdMessage("function:%s parameters error!\n",__func__);
+		return VCF_ERROR;
+	}
+	int i,nLines=numLines;
+	char *tmpLineStr;
+	char **tmpBlockStrs;
+	
+	btMallocFreeCharP(&tmpLineStr,BT_MAX_LINE_SIZE,BT_MALLOC);
+	if(VCF_EOF==vcfFileReadLine(fp,tmpLineStr,BT_MAX_LINE_SIZE))
+	{
+		btMallocFreeCharP(&tmpLineStr,0,BT_FREE);
+		return VCF_EOF;
+	}
+	btMallocFreeCharPP(&(tmpBlockStrs),1,strlen(tmpLineStr)+1,BT_MALLOC);
+	strcpy(tmpBlockStrs[0],tmpLineStr);
+	
+	//free dataBlock;
+	clearDataBlock_allFormat(dbafp);
+
+	//read data block
+	for(i=1;i<nLines;i++)
+	{
+		//memset(tmpLineStr,0,BT_MAX_LINE_SIZE);
+		if(VCF_EOF==vcfFileReadLine(fp,tmpLineStr,BT_MAX_LINE_SIZE))
+		{
+			break;
+		}
+		btAddCharPP(&(tmpBlockStrs),1+i,strlen(tmpLineStr)+1);
+		strcpy(tmpBlockStrs[i],tmpLineStr);
+	}
+	if(i<nLines)
+	{
+		nLines=i;
+	}
+	btMallocFreeCharP(&tmpLineStr,0,BT_FREE);
+
+	//parsing data block
+	dbafp->numDataLines=nLines;
+	dbafp->dataLines=(DATA_LINE_ALL_FORMAT*)malloc(nLines*sizeof(DATA_LINE_ALL_FORMAT));
+	if(NULL==dbafp->dataLines)
+	{
+		btStdMessage("DATA_LINE* malloc error!\n");
+		exit(1);
+	}
+	//#pragma omp parallel for num_threads(30) private(pRecord,str,pStr,p,k,j)
+	#pragma omp parallel for num_threads(OPEN_MP_THREAD_NUM)
+	for(i=0;i<nLines;i++)
+	{
+		memset((dbafp->dataLines+i),0,sizeof(DATA_LINE_ALL_FORMAT));
+		vcfFileParseDataLine_allFormat(fp,tmpBlockStrs[i],(dbafp->dataLines+i));
+		//check number of head line items and number of samples for equality
+		if(dbafp->dataLines[i].numSamples!=fp->numSamples)
+		{
+			btStdMessage("function:%s Vcf data line samples number error,system quit\n",__func__);
+			exit(1);
+		}
+	}
+	btMallocFreeCharPP(&(tmpBlockStrs),i,0,BT_FREE);
+	if(nLines!=numLines)
+	{
+		return VCF_READING_UNFULL;
+	}
+	return VCF_OK;
+}
+
+void clearDataLine_allFormat(DATA_LINE_ALL_FORMAT *dlafp)
+{
+	if(0==dlafp->numSamples)
+	{
+		return;
+	}
+	
+	btMallocFreeCharP(&(dlafp->rawDataLine),0,BT_FREE);
+	if(dlafp->numFormats)
+	{
+		int i;
+		for(i=0;i<dlafp->numFormats;i++)
+		{
+			btMallocFreeCharP(&(dlafp->dataFormatStr[i].format),0,BT_FREE);
+			free(dlafp->dataFormatStr[i].dataStr);
+		}
+		free(dlafp->dataFormatStr);
+	}
+	dlafp->numSamples=0;
+	dlafp->numFormats=0;
+}
+void clearDataBlock_allFormat(DATA_BLOCK_ALL_FORMAT *dbafp)
+{
+	if(0==dbafp->numDataLines)
+	{
+		return;
+	}
+
+	int i;
+	for(i=0;i<dbafp->numDataLines;i++)
+	{
+		clearDataLine_allFormat(dbafp->dataLines+i);
+	}
+	free(dbafp->dataLines);
+	dbafp->dataLines=NULL;
+	dbafp->numDataLines=0;
+}
+
+void printDataLine_allFormat(DATA_LINE_ALL_FORMAT *dlafp)
+{
+	int i,j;
+	//printf("rawDataLine:%s\n",dl->rawDataLine);
+	printf("chrom:%s\n",dlafp->dataInfo.chrom);
+	printf("pos:%s\n",dlafp->dataInfo.pos);
+	printf("ID:%s\n",dlafp->dataInfo.ID);
+	printf("ref:%s\n",dlafp->dataInfo.ref);
+	printf("alt:%s\n",dlafp->dataInfo.alt);
+	printf("qual:%s\n",dlafp->dataInfo.qual);
+	printf("filter:%s\n",dlafp->dataInfo.filter);
+	printf("info:%s\n",dlafp->dataInfo.info);
+	printf("format:%s\n",dlafp->dataInfo.format);
+	printf("numSamples:%d\n",dlafp->numSamples);
+	printf("numFormats:%d\n",dlafp->numFormats);
+		
+	for(i=0;i<dlafp->numFormats;i++)
+	{
+		printf("%s\n",dlafp->dataFormatStr[i].format);
+		for(j=0;j<dlafp->numSamples;j++)
+		{
+			printf("%s\t",dlafp->dataFormatStr[i].dataStr[j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
 
 
